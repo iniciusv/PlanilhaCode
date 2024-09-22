@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Text.RegularExpressions;
 
 public static class MarkdownHelper
 {
@@ -78,12 +79,18 @@ public static class MarkdownHelper
 			}
 
 			var nomeColuna = member.Member.Name;
+			var nomeColunaFormatado = InserirQuebraDeLinhaNoTitulo(nomeColuna);
 			var compiled = expr.Compile();
 			var dados = compiled.Invoke().ToList();
 
-			colunasDict.Add(nomeColuna, dados);
+			colunasDict.Add(nomeColunaFormatado, dados);
 		}
 
-		return GerarTabelaMarkdown(colunasDict);
+		return GerarTabelaMarkdown(colunasDict); // A função GerarTabelaMarkdown original deve ser modificada para aceitar e lidar com HTML no título.
+	}
+
+	private static string InserirQuebraDeLinhaNoTitulo(string titulo)
+	{
+		return Regex.Replace(titulo, "(?<=[a-z])(?=[A-Z])", "<br>");
 	}
 }

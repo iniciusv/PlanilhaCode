@@ -47,12 +47,12 @@ public static class Previsao
 		//string tabelaMarkdown = MarkdownHelper.GerarTabelaMarkdown(colPeriodo, colDemanda, colNaive, colMediaCumulativa, colMediaMovel );
 		string tabelaMarkdown = MarkdownHelper.GerarTabelaMarkdown(
 			() => demandas,
-			() => naiveForecast,
-			() => mediaCumulativa,
-			() => errosCumulativa,
-			() => errosAbsolutosCumulativa,
-			() => errosQuadradosCumulativa,
-			() => errosPercentuaisAbsolutosCumulativa
+			() => naiveForecast
+			//() => mediaCumulativa,
+			//() => errosCumulativa,
+			//() => errosAbsolutosCumulativa,
+			//() => errosQuadradosCumulativa,
+			//() => errosPercentuaisAbsolutosCumulativa
 		);
 
 		Console.WriteLine(tabelaMarkdown);
