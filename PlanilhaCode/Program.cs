@@ -1,8 +1,10 @@
-﻿public class Program
+﻿
+
+public class Program
 {
 	public static void Main()
 	{
-		CallForecastingModel();
+		CallForecasters();
 	}
 	static void CallForecastingModel()
 	{
@@ -35,5 +37,17 @@
 		// Output the final forecasted demand
 		double finalForecast = model.GetForecast(howMuchInTheFuture);
 		Console.WriteLine($"\nForecasted demand for t=105: {finalForecast:F2}");
+	}
+	static void CallForecasters()
+	{
+		// Exemplo de dados de entrada
+		var identificadoresTempo = new List<string?> {"Jan 2012","Feb 2012","Mar 2012","Apr 2012","May 2012","Jun 2012","Jul 2012","Aug 2012","Sep 2012","Oct 2012","Nov 2012",
+"Dec 2012","Jan 2013","Feb 2013","Mar 2013","Apr 2013","May 2013","Jun 2013","Jul 2013","Aug 2013","Sep 2013","Oct 2013","Nov 2013","Dec 2013","Jan 2014","Feb 2014","Mar 2014","Apr 2014","May 2014",
+"Jun 2014","Jul 2014","Aug 2014","Sep 2014","Oct 2014","Nov 2014","Dec 2014"};
+
+		var demandas = new List<double?> {584,552,544,576,585,784,1026,1098,666,504,576,1224,720,729,747,621,819,1260,1368,1530,873,976,624,1416,855,528,729,800,744,928,1560,1746,909,1773,2000,1512};
+
+		// Chama o método estático da classe Previsao
+		Previsao.CalcularPrevisoes(identificadoresTempo, demandas);
 	}
 }

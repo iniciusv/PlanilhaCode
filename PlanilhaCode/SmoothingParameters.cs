@@ -30,7 +30,7 @@
 
 public class ForecastingModel
 {
-	private SmoothingParameters parameters;
+	public SmoothingParameters parameters;
 
 	public ForecastingModel(double alpha, double beta, double initialLevel, double initialTrend)
 	{
@@ -45,5 +45,11 @@ public class ForecastingModel
 	public double GetForecast(int periodsAhead)
 	{
 		return parameters.Forecast(periodsAhead);
+	}
+
+	public double UpdateAndForecast(double observedValue)
+	{
+		UpdateModel(observedValue);  // Updates the model with the latest observed value
+		return GetForecast(1);       // Returns forecast for one period ahead
 	}
 }
