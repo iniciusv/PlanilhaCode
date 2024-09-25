@@ -16,48 +16,72 @@ public static class Previsao
 		var mediaCumulativa = CalcularMediaCumulativa(demandas, totalPeriodos);
 
 		// Calcula Média Móvel (defina o período conforme necessário)
-		int periodoMediaMovel = 3;
+		int periodoMediaMovel = 12;
 		var mediaMovel = CalcularMediaMovel(demandas, totalPeriodos, periodoMediaMovel);
 
 		// Calcula as métricas de erro para cada método
 		Console.WriteLine("\nMétricas de Erro:");
 
-		// Naive Forecast
-		var (errosNaive, errosAbsolutosNaive, errosQuadradosNaive, errosPercentuaisAbsolutosNaive) = CalcularErrosIndividuais(demandas, naiveForecast);
-		var metricasNaive = CalcularMetricasErro(errosNaive, errosAbsolutosNaive, errosQuadradosNaive, errosPercentuaisAbsolutosNaive);
-		Console.WriteLine("### Naive Forecast:");
-		ExibirMetricasErro(metricasNaive);
 
 
-		// Média Cumulativa
-		var (errosCumulativa, errosAbsolutosCumulativa, errosQuadradosCumulativa, errosPercentuaisAbsolutosCumulativa) = CalcularErrosIndividuais(demandas, mediaCumulativa);
-		var metricasMediaCumulativa = CalcularMetricasErro(errosCumulativa, errosAbsolutosCumulativa, errosQuadradosCumulativa, errosPercentuaisAbsolutosCumulativa);
-
-		Console.WriteLine("\n### Média Cumulativa:");
-		ExibirMetricasErro(metricasMediaCumulativa);
-
-		// Média Móvel
-		var (errosMediaMovel, errosAbsolutosMediaMovel, errosQuadradosMediaMovel, errosPercentuaisAbsolutosMediaMovel) = CalcularErrosIndividuais(demandas, mediaMovel);
-		var metricasMediaMovel = CalcularMetricasErro(errosMediaMovel, errosAbsolutosMediaMovel, errosQuadradosMediaMovel, errosPercentuaisAbsolutosMediaMovel);
-		Console.WriteLine("\n### Média Móvel:");
-		ExibirMetricasErro(metricasMediaMovel);
+		// Cálculo dos erros (lista de doubles)
+		var errosQuadradosNaive = new List<double>();
+		var errosQuadradosMediaCumulativa = new List<double>();
+		var errosQuadradosMediaMovel = new List<double>();
 
 
-		// Gera e exibe a tabela em Markdown usando o método da classe MarkdownHelper
-		//string tabelaMarkdown = MarkdownHelper.GerarTabelaMarkdown(colPeriodo, colDemanda, colNaive, colMediaCumulativa, colMediaMovel );
-		string tabelaMarkdown = MarkdownHelper.GerarTabelaMarkdown(
-			() => demandas,
-			() => naiveForecast
-			//() => mediaCumulativa,
-			//() => errosCumulativa,
-			//() => errosAbsolutosCumulativa,
-			//() => errosQuadradosCumulativa,
-			//() => errosPercentuaisAbsolutosCumulativa
-		);
+		double rmseNaive = CalcularRMSE(errosQuadradosNaive.ConvertAll(x => (double)x));
+		double rmseMediaCumulativa = CalcularRMSE(errosQuadradosMediaCumulativa.ConvertAll(x => (double)x));
+		double rmseMediaMovel = CalcularRMSE(errosQuadradosMediaMovel.ConvertAll(x => (double)x));
 
-		Console.WriteLine(tabelaMarkdown);
+		Console.WriteLine($"RMSE Naive Forecast: {rmseNaive}");
+		Console.WriteLine($"RMSE Média Cumulativa: {rmseMediaCumulativa}");
+		Console.WriteLine($"RMSE Média Móvel: {rmseMediaMovel}");
 
-		Console.WriteLine(tabelaMarkdown);
+		//// Naive Forecast
+		//var (errosNaive, errosAbsolutosNaive, errosQuadradosNaive, errosPercentuaisAbsolutosNaive) = CalcularErrosIndividuais(demandas, naiveForecast);
+		//var metricasNaive = CalcularMetricasErro(errosNaive, errosAbsolutosNaive, errosQuadradosNaive, errosPercentuaisAbsolutosNaive);
+		//Console.WriteLine("### Naive Forecast:");
+		//ExibirMetricasErro(metricasNaive);
+
+
+		//// Média Cumulativa
+		//var (errosCumulativa, errosAbsolutosCumulativa, errosQuadradosCumulativa, errosPercentuaisAbsolutosCumulativa) = CalcularErrosIndividuais(demandas, mediaCumulativa);
+		//var metricasMediaCumulativa = CalcularMetricasErro(errosCumulativa, errosAbsolutosCumulativa, errosQuadradosCumulativa, errosPercentuaisAbsolutosCumulativa);
+
+		//Console.WriteLine("\n### Média Cumulativa:");
+		//ExibirMetricasErro(metricasMediaCumulativa);
+
+		//// Média Móvel
+		//var (errosMediaMovel, errosAbsolutosMediaMovel, errosQuadradosMediaMovel, errosPercentuaisAbsolutosMediaMovel) = CalcularErrosIndividuais(demandas, mediaMovel);
+		//var metricasMediaMovel = CalcularMetricasErro(errosMediaMovel, errosAbsolutosMediaMovel, errosQuadradosMediaMovel, errosPercentuaisAbsolutosMediaMovel);
+		//Console.WriteLine("\n### Média Móvel:");
+		//ExibirMetricasErro(metricasMediaMovel);
+
+		//string tabelaCSV = CSVHelper.GerarTabelaCSV(
+		//	() => demandas,
+		//	() => naiveForecast,
+		//	() => mediaCumulativa,
+		//	() => mediaMovel,
+
+		//	() => errosNaive,
+		//	() => errosAbsolutosNaive,
+		//	() => errosQuadradosNaive,
+		//	() => errosPercentuaisAbsolutosNaive,
+
+		//	() => errosCumulativa,
+		//	() => errosAbsolutosCumulativa,
+		//	() => errosQuadradosCumulativa,
+		//	() => errosPercentuaisAbsolutosCumulativa,
+
+		//	() => errosMediaMovel,
+		//	() => errosAbsolutosMediaMovel,
+		//	() => errosQuadradosMediaMovel,
+		//	() => errosPercentuaisAbsolutosMediaMovel
+		//);
+
+
+		//Console.WriteLine(tabelaCSV);
 	}
 
 	private static IList<double?> CalcularNaiveForecast(IList<double?> demandas, int totalPeriodos)
@@ -256,5 +280,13 @@ public static class Previsao
 		Console.WriteLine($"MSE: {metricas["MSE"]:F2}");
 		Console.WriteLine($"RMSE: {metricas["RMSE"]:F2}");
 		Console.WriteLine($"MAPE: {metricas["MAPE"]:F2}%");
+	}
+	public static double CalcularRMSE(List<double> errosQuadrados)
+	{
+		if (errosQuadrados == null || !errosQuadrados.Any())
+			throw new ArgumentException("A lista de erros quadrados não pode ser nula ou vazia.");
+
+		double mse = errosQuadrados.Average(); // Calcula o Mean Squared Error (MSE)
+		return Math.Sqrt(mse); // Calcula a raiz quadrada do MSE para obter o RMSE
 	}
 }
