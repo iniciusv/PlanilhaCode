@@ -9,7 +9,7 @@ public class Program
 		//var forecastNaive = new List<double?> { null, 165, 201, 239, 216, 251, 269, 299, 332, 357, 410, 603 };
 
 
-		var forecastnaive = Forecaster.CalculateMovingAverage(demanda, 2);
+		var forecastnaive = Forecaster.CalculateCumulativeMean(demanda);
 		var index = 1;
 
 		foreach (var forecast in forecastnaive)
@@ -23,10 +23,10 @@ public class Program
 			index++;
 		}
 
-		//var forecastCumulativeMAPE = Statistics.CalculateMAPE(demanda, forecastCumulative);
+		var forecastCumulativeMAPE = Statistics.CalculateMAPE(demanda, forecastnaive);
 		//var forecastCumulativeRMSE = Statistics.CalculateRMSE(demanda, forecastCumulative);
 
-		//Console.WriteLine($"O MAPE da lista é: {forecastCumulativeMAPE.FormatNumberSignificantDigits(4)}");
+		Console.WriteLine($"O MAPE da lista é: {forecastCumulativeMAPE.FormatNumberSignificantDigits(4)}");
 		//Console.WriteLine($"O RMSE da lista é: {forecastCumulativeRMSE.FormatNumberSignificantDigits(4)}");
 		Console.WriteLine(Statistics.CalculateCoefficientOfVariation(demanda));
 	}

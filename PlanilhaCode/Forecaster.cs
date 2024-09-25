@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 public class Forecaster
 {
@@ -39,16 +40,16 @@ public class Forecaster
 			throw new ArgumentException("A lista de demanda está vazia ou nula.");
 
 		// Cria uma lista de cumulative mean com espaço adicional para os meses futuros
-		List<double?> cumulativeMean = new List<double?>(new double?[demand.Count + monthsInFuture]);
+		List<double?> cumulativeMean = new List<double?>(new double?[demand.Count + monthsInFuture + 1]);
 		double sum = 0;
 		int count = 0;
 
 		// O primeiro mês não pode ter uma média cumulativa baseada em meses anteriores
-		if (demand[0].HasValue)
+		if (demand[1].HasValue)
 		{
 			sum += demand[0].Value;
 			count++;
-			cumulativeMean[0] = demand[0];  // Repete o valor do primeiro mês
+			cumulativeMean[1] = demand[0];  // Repete o valor do primeiro mês
 		}
 		else
 		{
@@ -56,23 +57,23 @@ public class Forecaster
 		}
 
 		// Calcula a média cumulativa para os meses atuais
-		for (int i = 1; i < demand.Count; i++)
+		for (int i = 2; i < demand.Count + 1; i++)
 		{
-			if (demand[i].HasValue)
+			if (demand[i-1].HasValue)
 			{
-				sum += demand[i].Value;  // Adiciona o valor do mês anterior
+				sum += demand[i-1].Value;  // Adiciona o valor do mês anterior
 				count++;
 				cumulativeMean[i] = sum / count;  // Calcula a média até o mês anterior
 			}
-			else
-			{
-				// Se o mês anterior é null, não atualiza a soma ou o contador
-				cumulativeMean[i] = null;
-			}
+			//else
+			//{
+			//	// Se o mês anterior é null, não atualiza a soma ou o contador
+			//	cumulativeMean[i] = null;
+			//}
 		}
 
 		// Preenche os meses futuros com a última média calculada
-		if (monthsInFuture > 0 && count > 0)
+		if (monthsInFuture -1 > 0 && count > 0)
 		{
 			double? lastCalculatedMean = cumulativeMean.Last(c => c.HasValue);  // Obtém a última média calculada
 			for (int i = demand.Count; i < demand.Count + monthsInFuture; i++)
