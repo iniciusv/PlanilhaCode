@@ -4,50 +4,44 @@ public class Program
 {
 	public static void Main()
 	{
-
-		var demanda = new List<double?> { 876, 1205, 700, 893, 1363, 725, 958, 1262, 695, 885, 1340, 747, 877, 1428, 869, 1021, 1325, 853, 947, 1400, 876 };
-		var forrecasts = new List<double?> { 946, 934, 1011, 938, 932, 1050, 974, 976, 1057, 971, 953, 1059, 985, 962, 1087, 1039, 1041, 1122, 1061, 1037, 1138, 1078 };
-
-
-		//var forrecastsNaive = Forecaster.CalculateNaiveForecast(demanda);
-		//var forrecastsCum = Forecaster.CalculateCumulativeMean(demanda);
-		//var forrecastsMove2 = Forecaster.CalculateMovingAverage(demanda,2);
-		//var forrecastsMove4 = Forecaster.CalculateMovingAverage(demanda,4);
-		var forrecasts2 = Forecaster.ExponentialSmoothing(demanda, 0.333);
+		var weekdays = new List<double?> { 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0 }; // Exemplo de variável independente
+		var discount = new List<double?> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0 };
+		var demanda = new List<double?> { 329,357,351,346,342,344,356,357,368,367,351,343,340,358,343,363,364,353,363,341,351,350,379,378,369,345,368,348,366,368,376,351,365,375,360,369,377,370,359,364,355,375,360,389,396,377,368,363,378,379,376,383,368,365,373,371,383,385,393,373,382,370,386,378,399,387,388,384,383,394,385,398,404,381,395,401,401,384,412,413,394,397,396,386,397,417,416,397,403,392,408,403
+		};
+		var indices = Enumerable.Range(0, demanda.Count).ToList();
+		//var forrecasts = new List<double?> { 946, 934, 1011, 938, 932, 1050, 974, 976, 1057, 971, 953, 1059, 985, 962, 1087, 1039, 1041, 1122, 1061, 1037, 1138, 1078 };
 
 
+		//var forrecasts2 = Forecaster.ExponentialSmoothing(demanda, 0.333);
 
 
 		//var index = 1;
-		//
+
 		//foreach (var forecast in forrecasts2)
 		//{
 		//	if (index < demanda.Count())
 		//		Console.WriteLine($"{index}-{demanda[index]}-{forecast}");
 		//	else
 		//		Console.WriteLine($"{index}- null -{forecast}");
-		//
+
 		//	index++;
 		//}
 
-		//var forrecasts = Forecaster.CalculateMovingAverage(demanda, 4, 1);
+		//var forrecastsNaiveMAPE = Statistics.CalculateMAPE(demanda, forrecasts);
+
+		//Console.WriteLine($"O MAPE da lista é: {forrecastsNaiveMAPE.GetValue()}");
 
 
-		var forrecastsNaiveMAPE = Statistics.CalculateMAPE(demanda, forrecasts);
-		//var forrecastsCumMAPE = Statistics.CalculateMAPE(demanda, forrecastsCum);
-		//var forrecastsMove2MAPE = Statistics.CalculateMAPE(demanda, forrecastsMove2);
-		//var forrecastsMove4MAPE = Statistics.CalculateMAPE(demanda, forrecastsMove4);
-		//var forecastRMSE = Statistics.CalculateRMSE(demanda, forrecasts);
-		//
-		Console.WriteLine($"O MAPE da lista é: {forrecastsNaiveMAPE.GetValue()}");
-		//Console.WriteLine($"O MAPE da lista é: {forrecastsCumMAPE.GetValue()}");
-		//Console.WriteLine($"O MAPE da lista é: {forrecastsMove2MAPE.GetValue()}");
-		//Console.WriteLine($"O MAPE da lista é: {forrecastsMove4MAPE.GetValue()}");
-		//Console.WriteLine($"O RMSE da lista é: {forecastRMSE.FormatNumberSignificantDigits(4)}");
-		//Console.WriteLine(Statistics.CalculateCoefficientOfVariation(demanda));
-
-
-
+		// Usando o modelo de regressão
+		try
+		{
+			var regressionResults = RegressionModel.MultipleLinearRegression(indices, demanda, weekdays, discount, indices.ToDoubleListNull());
+			RegressionModel.PrintResults(regressionResults);
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine($"Erro ao executar a regressão: {e.Message}");
+		}
 	}
 	static void CallForecastingModel()
 	{

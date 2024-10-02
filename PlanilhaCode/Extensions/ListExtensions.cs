@@ -27,4 +27,13 @@ public static class ListExtensions
 		}
 		return result;
 	}
+	public static List<double?> ToDoubleListNull(this List<int> source)
+	{
+		var result = new List<double?>();
+		foreach (int number in source)
+		{
+			result.Add((double?)number);
+		}
+		return result;
+	}
 }
