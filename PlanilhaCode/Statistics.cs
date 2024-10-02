@@ -87,6 +87,30 @@
 
 		return coefficientOfVariation;
 	}
+	public static double CalculateMPE(List<double?> observed, List<double?> forecasted)
+	{
+		if (observed == null || forecasted == null)
+			throw new ArgumentNullException("As listas não podem ser nulas.");
+
+		if (observed.Count != forecasted.Count)
+			throw new ArgumentException("As listas devem ter o mesmo número de elementos.");
+
+		// Filtrar os pares onde ambos os valores são não-nulos e os valores observados não são zero
+		var validPairs = observed.Zip(forecasted, (obs, fore) => (obs, fore))
+								 .Where(pair => pair.obs.HasValue && pair.fore.HasValue && pair.obs.Value != 0)
+								 .ToList();
+
+		if (validPairs.Count == 0)
+			throw new InvalidOperationException("Não há dados suficientes para calcular o MPE.");
+
+		// Calcular o erro percentual para cada par válido
+		double totalPercentageError = validPairs.Sum(pair => (pair.fore.Value - pair.obs.Value) / pair.obs.Value);
+
+		// Calcular a média do erro percentual
+		double mpe = (totalPercentageError / validPairs.Count) * 100;
+
+		return mpe;
+	}
 }
 public class Result
 {

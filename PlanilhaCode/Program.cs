@@ -5,30 +5,49 @@ public class Program
 	public static void Main()
 	{
 
-		var demanda = new List<double?> { 1027, 1008, 1130, 1182, 1074, 1189, 1043, 1085, 1152, 1110, 1014, 1149, 1121, 1169 };
-		//var forecastNaive = new List<double?> { null, 165, 201, 239, 216, 251, 269, 299, 332, 357, 410, 603 };
+		var demanda = new List<double?> { 876, 1205, 700, 893, 1363, 725, 958, 1262, 695, 885, 1340, 747, 877, 1428, 869, 1021, 1325, 853, 947, 1400, 876 };
+		var forrecasts = new List<double?> { 946, 934, 1011, 938, 932, 1050, 974, 976, 1057, 971, 953, 1059, 985, 962, 1087, 1039, 1041, 1122, 1061, 1037, 1138, 1078 };
 
 
-		var forecastnaive = Forecaster.CalculateCumulativeMean(demanda);
-		var index = 1;
+		//var forrecastsNaive = Forecaster.CalculateNaiveForecast(demanda);
+		//var forrecastsCum = Forecaster.CalculateCumulativeMean(demanda);
+		//var forrecastsMove2 = Forecaster.CalculateMovingAverage(demanda,2);
+		//var forrecastsMove4 = Forecaster.CalculateMovingAverage(demanda,4);
+		var forrecasts2 = Forecaster.ExponentialSmoothing(demanda, 0.333);
 
-		foreach (var forecast in forecastnaive)
-		{
-			var foo = index - 1;
-			if (index < demanda.Count())
-				Console.WriteLine($"{index}-{demanda[foo]}-{forecast}");
-			else
-				Console.WriteLine($"{index}- null -{forecast}");
 
-			index++;
-		}
 
-		var forecastCumulativeMAPE = Statistics.CalculateMAPE(demanda, forecastnaive);
-		//var forecastCumulativeRMSE = Statistics.CalculateRMSE(demanda, forecastCumulative);
 
-		Console.WriteLine($"O MAPE da lista é: {forecastCumulativeMAPE.FormatNumberSignificantDigits(4)}");
-		//Console.WriteLine($"O RMSE da lista é: {forecastCumulativeRMSE.FormatNumberSignificantDigits(4)}");
-		Console.WriteLine(Statistics.CalculateCoefficientOfVariation(demanda));
+		//var index = 1;
+		//
+		//foreach (var forecast in forrecasts2)
+		//{
+		//	if (index < demanda.Count())
+		//		Console.WriteLine($"{index}-{demanda[index]}-{forecast}");
+		//	else
+		//		Console.WriteLine($"{index}- null -{forecast}");
+		//
+		//	index++;
+		//}
+
+		//var forrecasts = Forecaster.CalculateMovingAverage(demanda, 4, 1);
+
+
+		var forrecastsNaiveMAPE = Statistics.CalculateMAPE(demanda, forrecasts);
+		//var forrecastsCumMAPE = Statistics.CalculateMAPE(demanda, forrecastsCum);
+		//var forrecastsMove2MAPE = Statistics.CalculateMAPE(demanda, forrecastsMove2);
+		//var forrecastsMove4MAPE = Statistics.CalculateMAPE(demanda, forrecastsMove4);
+		//var forecastRMSE = Statistics.CalculateRMSE(demanda, forrecasts);
+		//
+		Console.WriteLine($"O MAPE da lista é: {forrecastsNaiveMAPE.GetValue()}");
+		//Console.WriteLine($"O MAPE da lista é: {forrecastsCumMAPE.GetValue()}");
+		//Console.WriteLine($"O MAPE da lista é: {forrecastsMove2MAPE.GetValue()}");
+		//Console.WriteLine($"O MAPE da lista é: {forrecastsMove4MAPE.GetValue()}");
+		//Console.WriteLine($"O RMSE da lista é: {forecastRMSE.FormatNumberSignificantDigits(4)}");
+		//Console.WriteLine(Statistics.CalculateCoefficientOfVariation(demanda));
+
+
+
 	}
 	static void CallForecastingModel()
 	{

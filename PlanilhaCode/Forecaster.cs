@@ -96,7 +96,7 @@ public class Forecaster
 		List<double?> movingAverages = new List<double?>(new double?[demand.Count + 1]);
 
 		// Calcula a média móvel para cada mês
-		for (int i = window; i < demand.Count +1; i++)
+		for (int i = window; i < demand.Count + 1; i++)
 		{
 			// Seleciona os dados dos últimos `window` meses antes do mês atual
 			var windowData = demand.Skip(i - window).Take(window).Where(x => x.HasValue).Select(x => x.Value).ToList();
@@ -112,5 +112,49 @@ public class Forecaster
 		}
 
 		return movingAverages;
+	}
+	public static List<double?> ExponentialSmoothing(List<double?> data, double alpha, double? initialForecast = null)
+	{
+		if (data == null || data.Count == 0)
+			throw new ArgumentException("Data list cannot be empty or null.");
+
+		if (alpha < 0 || alpha > 1)
+			throw new ArgumentException("Alpha must be between 0 and 1.");
+
+		List<double?> forecasts = new List<double?>();
+		double? previousForecast = initialForecast;
+
+		// If no initial forecast is provided, use the first data point as the initial forecast
+		if (!initialForecast.HasValue && data[0].HasValue)
+		{
+			previousForecast = data[0];
+		}
+
+		// Calculate forecasts for each data point
+		foreach (var currentData in data)
+		{
+			if (!currentData.HasValue)
+			{
+				// If the current data point is null, forecast cannot be calculated
+				forecasts.Add(null);
+			}
+			else
+			{
+				if (!previousForecast.HasValue)
+				{
+					// If no previous forecast exists, use current data as forecast (common in first iteration)
+					previousForecast = currentData;
+				}
+
+				// Apply the exponential smoothing formula
+				double newForecast = alpha * currentData.Value + (1 - alpha) * previousForecast.Value;
+				forecasts.Add(newForecast);
+
+				// Update the previous forecast
+				previousForecast = newForecast;
+			}
+		}
+
+		return forecasts;
 	}
 }
