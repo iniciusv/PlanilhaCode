@@ -1,48 +1,117 @@
 ﻿
 
+using MathNet.Numerics;
+using PlanilhaCode;
+
 public class Program
 {
 	public static void Main()
 	{
-		var weekdays = new List<double?> { 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0 }; // Exemplo de variável independente
-		var discount = new List<double?> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0 };
-		var demanda = new List<double?> { 329,357,351,346,342,344,356,357,368,367,351,343,340,358,343,363,364,353,363,341,351,350,379,378,369,345,368,348,366,368,376,351,365,375,360,369,377,370,359,364,355,375,360,389,396,377,368,363,378,379,376,383,368,365,373,371,383,385,393,373,382,370,386,378,399,387,388,384,383,394,385,398,404,381,395,401,401,384,412,413,394,397,396,386,397,417,416,397,403,392,408,403
-		};
-		var indices = Enumerable.Range(0, demanda.Count).ToList();
-		//var forrecasts = new List<double?> { 946, 934, 1011, 938, 932, 1050, 974, 976, 1057, 971, 953, 1059, 985, 962, 1087, 1039, 1041, 1122, 1061, 1037, 1138, 1078 };
+
+	}
 
 
-		//var forrecasts2 = Forecaster.ExponentialSmoothing(demanda, 0.333);
 
 
-		//var index = 1;
+	private static void CallHoltWinters()
+	{
+		// Assuming alpha, beta, and gamma (usually these should be optimized)
+		double alpha = 0.2;
+		double beta = 0.1;
+		double gamma = 0.15;
 
-		//foreach (var forecast in forrecasts2)
-		//{
-		//	if (index < demanda.Count())
-		//		Console.WriteLine($"{index}-{demanda[index]}-{forecast}");
-		//	else
-		//		Console.WriteLine($"{index}- null -{forecast}");
+		// Seasonality index initialization (based on provided distributions)
+		double[] seasonInitial = { 0.6, 0.8, 1.4, 1.2 }; // Starting at Q1 through Q4
 
-		//	index++;
-		//}
+		// Initialize model
+		HoltWintersForecast model = new HoltWintersForecast(alpha, beta, gamma, 4, seasonInitial);
 
-		//var forrecastsNaiveMAPE = Statistics.CalculateMAPE(demanda, forrecasts);
+		// Historical data (you will need actual demand values here for past quarters)
+		double[] historicalDemand = { 1047 / 1.4 }; // Reverse calculated base level for Q3
 
-		//Console.WriteLine($"O MAPE da lista é: {forrecastsNaiveMAPE.GetValue()}");
+		// Forecast the next quarter (Q4)
+		double forecastQ4 = model.ForecastNext(historicalDemand);
 
+		Console.WriteLine($"Forecast for 2014Q4 is: {forecastQ4} units");
+	}
 
-		// Usando o modelo de regressão
-		try
+	private static void CallEOQ()
+	{
+		var Demand = 2000;
+		var orderCost = 50; //cost/unit
+		var holdingCost = 12.5;//Ce, cost of Unit/time
+		var fixOrderingCost = 50;
+		InventoryManagement inventory = new InventoryManagement(2000, orderCost, 10, 0.1, 17.5, 0);
+
+		// Calculando o EOQ - Economic Order Quantity
+		double eoq = inventory.CalculateEconomicOrderQuantity_EOQ();
+		Console.WriteLine($"EOQ (Quantidade Econômica de Pedido): {eoq:N2} unidades");
+
+		Console.WriteLine($"EOQ (Quantidade Econômica de Pedido): {eoq * 100:N2} doletas");
+
+		// Calculando o TRC - Total Relevant Cost
+		double trc = inventory.CalculateTotalRelevantCost_TRC();
+		Console.WriteLine($"TRC (Custo Total Relevante Ótimo): ${trc:N2}");
+
+		// Calculando o TC - Total Cost
+		double tc = inventory.CalculateTotalCost();
+		Console.WriteLine($"TC (Custo Total Anual): ${tc:N2}");
+	}
+
+	private static void Discounts()
+	{
 		{
-			var regressionResults = RegressionModel.MultipleLinearRegression(indices, demanda, weekdays, discount, indices.ToDoubleListNull());
-			RegressionModel.PrintResults(regressionResults);
-		}
-		catch (Exception e)
-		{
-			Console.WriteLine($"Erro ao executar a regressão: {e.Message}");
+			// Parâmetros do problema
+			int demand = 1000; // Demanda anual em unidades
+			double unitCost = 10; // Custo de compra por unidade
+			double holdingRate = 0.1; // Taxa de manutenção
+			double fixOrderingCost = 100; // Custo fixo de fazer um pedido
+			int discountThreshold = 1000; // Limiar para desconto incremental
+			double discountRate = 0.005; // Taxa de desconto de 0.5%
+
+			// Criar instância do gerenciador de inventário com os valores corretos
+			InventoryManagement inventory = new InventoryManagement(unitCost: unitCost, fixOrderingCost: fixOrderingCost, demand: demand, holdingRate: holdingRate);
+
+			// Calculando o EOQ - Economic Order Quantity
+			double eoq = inventory.CalculateEconomicOrderQuantity_EOQ();
+			Console.WriteLine($"EOQ (Quantidade Econômica de Pedido): {eoq:N0} unidades");
+
+			// Usando DiscountCalculator para calcular o custo total com desconto incremental
+			double totalCost = DiscountCalculator.CalculateIncrementalDiscountCost(unitCost, (int)Math.Ceiling(eoq), discountThreshold, discountRate);
+			Console.WriteLine($"Custo total com desconto para {Math.Ceiling(eoq):N0} unidades: ${totalCost:N2}");
+
+			// Calculando o TRC - Total Relevant Cost
+			double trc = inventory.CalculateTotalRelevantCost_TRC();
+			Console.WriteLine($"TRC (Custo Total Relevante Ótimo): ${trc:N2}");
+
+			// Calculando o TC - Total Cost
+			double tc = inventory.CalculateTotalCost();
+			Console.WriteLine($"TC (Custo Total Anual): ${tc:N2}");
 		}
 	}
+
+	public static void CalculateOptimalOrderQuantity()
+	{
+		// Initialize the InventoryManagement class with necessary parameters
+		InventoryManagement inventoryManagement = new InventoryManagement(
+			unitCost: 20,                   // Cost per unit
+			fixOrderingCost: 90,            // Ordering cost
+			demand: 7432,                   // Annual demand
+			holdingRate: 0.03               // Holding rate (3% of the unit cost)
+		);
+
+		// Calculate EOQ
+		double eoq = inventoryManagement.CalculateEconomicOrderQuantity_EOQ();
+		Console.WriteLine($"The Economic Order Quantity (EOQ) is: {Math.Ceiling(eoq)} units.");
+		double orderCycleTimeInWeeks = inventoryManagement.CalculateOrderCycleTimeInWeeks();
+
+
+		Console.WriteLine($"The expected time between orders is: {Math.Round(orderCycleTimeInWeeks, 2)} weeks.");
+		Console.WriteLine($"Quantas vezes no ano: {52/orderCycleTimeInWeeks} .");
+
+	}
+
+
 	static void CallForecastingModel()
 	{
 		var Alpha = 0.25;
@@ -86,8 +155,139 @@ public class Program
 
 		// Chama o método estático da classe Previsao
 		Previsao.CalcularPrevisoes(identificadoresTempo, demandas);
+
+
+	}
+
+	static void Week4Gradded1_Part1()
+	{ var inventory = new InventoryManagement(
+        unitCost: 78,  // Unit cost per bottle
+        fixOrderingCost: 513,  // Cost of placing an order
+        demand: 34954,  // Annual demand for the wine
+        holdingRate: 0.14
+		,  // Holding rate
+        leadTimeDays: 2 * (365.0 / 48)  // Lead time converted to days, considering 48 weeks/year
+	);
+
+
+
+		double eoq = inventory.CalculateEconomicOrderQuantity_EOQ();
+		Console.WriteLine($"EOQ ${eoq}");
+
+		double orderCycleTimeInWeeks = inventory.CalculateOrderCycleTimeInWeeks();
+
+    // Annual Purchasing Cost
+    double annualPurchasingCost = inventory.Demand.Value * inventory.UnitCost;
+
+    // Annual Ordering Cost
+    double numberOfOrdersPerYear = inventory.Demand.Value / eoq;
+    double annualOrderingCost = numberOfOrdersPerYear * inventory.FixOrderingCost;
+
+    // Annual Average Cycle Stock Cost
+    double averageCycleStock = eoq / 2;
+    double annualAverageCycleStockCost = averageCycleStock * inventory.HoldingCost.Value;
+
+    // Annual Pipeline Inventory Cost
+    double annualPipelineInventoryCost = inventory.CalculateReorderPoint() * inventory.UnitCost;
+
+    Console.WriteLine($"Annual Purchasing Cost: ${annualPurchasingCost}");
+    Console.WriteLine($"Annual Ordering Cost: ${annualOrderingCost}");
+    Console.WriteLine($"Annual Average Cycle Stock Cost: ${annualAverageCycleStockCost}");
+    Console.WriteLine($"Annual Pipeline Inventory Cost: ${annualPipelineInventoryCost}");
+}
+
+	static void Week4Gradded1part2()
+	{
+		double annualDemand = 34954;
+		double purchaseCostPerUnit = 78;
+		double orderingCostPerOrder = 513;
+		double holdingCostRate = 0.14;
+		double weeksPerYear = 48;
+		double orderLeadTimeWeeks = 2;
+		double orderCycleTimeWeeks = 2.48967214052755;
+		double optimalOrderQuantity = 1813; // From previous part
+
+		double totalPurchaseCost = purchaseCostPerUnit * annualDemand;
+
+		double numOrdersPerYear = weeksPerYear / orderCycleTimeWeeks;
+		double totalOrderingCost = numOrdersPerYear * orderingCostPerOrder;
+
+		double weeklyDemand = annualDemand / weeksPerYear;
+		double averagePipelineInventory = weeklyDemand * orderLeadTimeWeeks;
+		double annualPipelineInventoryCost = holdingCostRate * averagePipelineInventory * purchaseCostPerUnit;
+
+		Console.WriteLine($"Total Purchase Cost: ${Math.Round(totalPurchaseCost)}");
+		Console.WriteLine($"Total Ordering Cost: ${Math.Round(totalOrderingCost)}");
+		Console.WriteLine($"Annual Pipeline Inventory Cost: ${Math.Round(annualPipelineInventoryCost)}");
+
+		double totalAnnualCost = totalPurchaseCost + totalOrderingCost + annualPipelineInventoryCost;
+		Console.WriteLine($"Estimated Total Annual Costs: ${Math.Round(totalAnnualCost)}");
+
+		// Calculate average cycle stock
+		double averageCycleStock = optimalOrderQuantity / 2;
+
+		// Calculate annual average cycle stock cost
+		double annualAverageCycleStockCost = averageCycleStock * purchaseCostPerUnit * holdingCostRate;
+
+		// Output the annual average cycle stock cost
+		Console.WriteLine($"Annual Average Cycle Stock Cost: ${Math.Round(annualAverageCycleStockCost)}");
+		Console.WriteLine($"---------------------------------------------------------");
+
+		InventoryManagement inventory = new InventoryManagement(unitCost: purchaseCostPerUnit, fixOrderingCost: orderingCostPerOrder, demand: annualDemand, holdingRate: holdingCostRate/*, leadTimeDays: leadTime*/);
+		// Calculando o EOQ - Economic Order Quantity
+		double eoq = inventory.CalculateEconomicOrderQuantity_EOQ();
+		inventory.UnitCost = 78+ 0.34;
+		var TC = inventory.CalculateTotalCost();
+
+		// Arredonda para cima e imprime o resultado
+		int optimalOrderQuantity1 = (int)Math.Ceiling(eoq);
+		Console.WriteLine($"The optimal order quantity for MelissaWhite is: {optimalOrderQuantity} bottles");
+		Console.WriteLine($"The TC for MelissaWhite is: {TC} $$$");
+		inventory.SetOrderCycleTime_T(409);
+		double eoq2 = inventory.CalculateEconomicOrderQuantity_EOQ();
+		int optimalOrderQuantity2 = (int)Math.Ceiling(eoq);
+		Console.WriteLine($"The optimal order quantity for MelissaWhite is: {optimalOrderQuantity2} bottles");
+
+
+		//inventory.UnitCost = purchaseCostPerUnit ()
+
+	}
+	static void Week4Gradded2part1()
+	{
+		double annualDemand = 3960;
+		double unitCost = 135;
+		double fixOrderingCost = 181;
+		double holdingRate = 0.2;
+
+		// Criar instância do gerenciador de inventário com os valores corretos
+		InventoryManagement inventory = new InventoryManagement(unitCost: unitCost, fixOrderingCost: fixOrderingCost, demand: annualDemand, holdingRate: holdingRate);
+
+		// Calculando o EOQ - Economic Order Quantity
+		double eoq = inventory.CalculateEconomicOrderQuantity_EOQ();
+		Console.WriteLine($"EOQ (Quantidade Econômica de Pedido): {eoq:N0} unidades");
+
+		double T = inventory.CalculateOrderCycleTime().Value;
+
+		Console.WriteLine($"T: {T} ");
+
+
+		var TRC = inventory.CalculateTotalRelevantCost_TRC();
+		Console.WriteLine($"TRC {TRC} $$");
+		Console.WriteLine($"---------------------------------------------------------");
+
+
+		var totalHoldingCost = inventory.CalculateTotalHoldingCost();
+		Console.WriteLine($"totalHoldingCost {totalHoldingCost} $$");
+		inventory.Quantity = 300;
+		var totalHoldingCost2 = inventory.CalculateTotalHoldingCost();
+		Console.WriteLine($"totalHoldingCost {totalHoldingCost2} $$");
+		Console.WriteLine($"diference {totalHoldingCost- totalHoldingCost2} $$");
+
 	}
 }
+
+
+
 
 
 
